@@ -33,6 +33,6 @@ class Day2Test {
 
   @Test fun test5() {
     val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day2Input.txt"
-    assertEquals("hello", findCommonLetters(inputFile))
+    assertEquals("wrziyfdmlumeqvaatbiosngkc", findCommonLetters(inputFile))
   }
 }

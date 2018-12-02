@@ -42,3 +42,19 @@ jar {
 task wrapper(type: Wrapper) {
     gradleVersion = "4.10.2"
 }
+
+test {
+    //we want display the following test events
+    testLogging {
+        exceptionFormat = 'full'
+        // print status of every test
+        events "PASSED", "STARTED", "FAILED", "SKIPPED"
+        afterSuite { desc, result ->
+            // Match the outermost suite
+            if (!desc.parent) {
+                // Print a summary at the end
+                println "\nTests Run: ${result.testCount}, Failures: ${result.failedTestCount}, Skipped: ${result.skippedTestCount}"
+            }
+        }
+    }
+}
