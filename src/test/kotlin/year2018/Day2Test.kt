@@ -24,4 +24,15 @@ class Day2Test {
     val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day2Input.txt"
     assertEquals(4940, checksum(inputFile))
   }
+
+  @Test fun test4() {
+    assertEquals(4, distance("hello", "world"))
+    assertEquals(2, distance("abcde", "axcye"))
+    assertEquals(1, distance("fghij", "fguij"))
+  }
+
+  @Test fun test5() {
+    val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day2Input.txt"
+    assertEquals("hello", findCommonLetters(inputFile))
+  }
 }

@@ -1,6 +1,7 @@
 package year2018
 
 import java.io.File
+import java.lang.Exception
 import java.util.*
 
 fun checksum(path: String): Int {
@@ -72,8 +73,41 @@ fun countID(id: String): Pair<Int, Int> {
   return Pair(twos, threes)
 }
 
+fun findCommonLetters(path: String): String {
+  val lines = File(path).readLines()
+  for (i in 0 until lines.size) {
+    for (j in i until lines.size) {
+      if (distance(lines[i], lines[j]) == 1) {
+        return common(lines[i], lines[j])
+      }
+    }
+  }
+
+  throw Exception("Not found!")
+}
+
 internal fun sortString(s: String): String {
   val chars = s.toCharArray()
   Arrays.sort(chars)
   return String(chars)
+}
+
+// Return the distance of 2 strings of the same length.
+fun distance(s1: String, s2: String): Int {
+  var diff = 0
+  for (i in 0 until s1.length) {
+    diff += if (s1[i] == s2[i]) 0 else 1
+  }
+  return diff
+}
+
+// Return the common letters between 2 strings of the same length.
+fun common(s1: String, s2: String): String {
+  val letters = mutableListOf<Char>()
+  for (i in 0 until s1.length) {
+    if (s1[i] == s2[i]) {
+      letters.add(s1[i])
+    }
+  }
+  return letters.joinToString(separator = "")
 }
