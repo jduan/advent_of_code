@@ -14,8 +14,13 @@ data class GuardSleep(
 ) {
   private val sleeps = mutableListOf<Sleep>()
 
-  fun addSleep(sleep: Sleep) {
+  fun addSleep(sleep: Sleep): GuardSleep {
     sleeps.add(sleep)
+    return this
+  }
+
+  override fun toString(): String {
+    return "GuardSleep(guardId=${guardId}, sleeps=${sleeps}"
   }
 }
 
@@ -58,11 +63,36 @@ fun parseLine(line: String): Event {
   }
 }
 
-//fun parseFile(path: String): Map<Int, List<GuardSleep>> {
-//  File(path).forEachLine { line ->
-//
-//  }
-//}
+fun parseFile(path: String): Map<Int, GuardSleep> {
+  val lines = File(path).readLines().sorted()
+  val guardToSleep = mutableMapOf<Int, GuardSleep>()
+  var guardId: Int = 0
+  var sleepStart: Int = 0
+  lines.forEach { line ->
+    val event = parseLine(line)
+    when(event) {
+      is ShiftStarts -> {
+        guardId = event.guardId
+      }
+      is FallAsleep -> {
+        sleepStart = event.minute
+      }
+      is WakesUp -> {
+        val sleepEnd = event.minute
+        val guardSleep = guardToSleep[guardId]
+        if (guardSleep == null) {
+          val gs = GuardSleep(guardId)
+          gs.addSleep(Sleep(sleepStart, sleepEnd))
+          guardToSleep[guardId] = gs
+        } else {
+          guardSleep.addSleep(Sleep(sleepStart, sleepEnd))
+        }
+      }
+    }
+  }
+
+  return guardToSleep
+}
 
 // Find the guard that spent the most minutes asleep.
 
