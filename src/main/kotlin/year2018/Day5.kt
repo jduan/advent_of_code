@@ -2,6 +2,8 @@ package year2018.day5
 
 import java.io.File
 
+assertEquals("p", reactor("nVvNOoHhiJjlLSuUvVsHhIp"))
+
 fun reactor(polymer: String): String {
   val size = polymer.length
   if (size < 2) {
@@ -13,6 +15,10 @@ fun reactor(polymer: String): String {
   var previous = 0
   var current = 1
   while (current < size) {
+    if (previous < 0) {
+      previous = current
+      current += 1
+    }
     val previousChar = polymer[previous]
     val currentChar = polymer[current]
     val diff = currentChar - previousChar
