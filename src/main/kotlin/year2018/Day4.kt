@@ -7,7 +7,9 @@ data class Sleep(
     val start: Int,
     // The minute the sleep ends
     val end: Int
-)
+) {
+  fun minutes() = end - start
+}
 
 data class GuardSleep(
     val guardId: Int
@@ -18,6 +20,9 @@ data class GuardSleep(
     sleeps.add(sleep)
     return this
   }
+
+  fun totalSleepMinutes() =
+      sleeps.fold(0) { acc, sleep ->  acc + sleep.minutes()}
 
   override fun toString(): String {
     return "GuardSleep(guardId=${guardId}, sleeps=${sleeps}"

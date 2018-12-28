@@ -32,4 +32,10 @@ class Day4Test {
     assertEquals(expectedResult, parseFile(inputFile))
   }
 
+  @Test fun test5() {
+    val guardSleep = GuardSleep(1559).addSleep(Sleep(16, 37)).addSleep(Sleep(44, 53)).
+        addSleep(Sleep(56, 57))
+    assertEquals(31, guardSleep.totalSleepMinutes())
+  }
+
 }
