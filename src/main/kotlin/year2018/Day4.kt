@@ -1,6 +1,5 @@
 package year2018.day4
 
-import year2018.findAllCoveredSquares
 import java.io.File
 
 data class Sleep(
@@ -45,14 +44,14 @@ fun parseLine(line: String): Event {
   return when {
     shiftStartsRegex.matches(line) -> {
       val (_, hour, minute, guardId) = shiftStartsRegex.find(line)!!.groupValues
-      ShiftStarts(hour.toInt(), minute.toInt(), guardId.toInt())
+      ShiftStarts(guardId.toInt(), hour.toInt(), minute.toInt())
     }
     fallAsleepRegex.matches(line) -> {
-      val (_, hour, minute, guardId) = fallAsleepRegex.find(line)!!.groupValues
+      val (_, hour, minute) = fallAsleepRegex.find(line)!!.groupValues
       FallAsleep(hour.toInt(), minute.toInt())
     }
     wakesUpRegex.matches(line) -> {
-      val (_, hour, minute, guardId) = wakesUpRegex.find(line)!!.groupValues
+      val (_, hour, minute) = wakesUpRegex.find(line)!!.groupValues
       WakesUp(hour.toInt(), minute.toInt())
     }
     else -> throw Exception("Unexpected line: $line")
