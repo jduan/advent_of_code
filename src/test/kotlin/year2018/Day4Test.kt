@@ -36,12 +36,13 @@ class Day4Test {
     val guardSleep = GuardSleep(1559).addSleep(Sleep(16, 37)).addSleep(Sleep(44, 53)).
         addSleep(Sleep(56, 57))
     assertEquals(31, guardSleep.totalSleepMinutes())
-    assertEquals(16, guardSleep.sleepMostMinute())
+    assertEquals(16, guardSleep.sleepMostMinute().first)
 
     val guardSleep2 = GuardSleep(71).addSleep(Sleep(6, 59)).addSleep(Sleep(49, 58))
-    assertEquals(49, guardSleep2.sleepMostMinute())
+    assertEquals(49, guardSleep2.sleepMostMinute().first)
   }
 
+  // part 1
   @Test fun test6() {
     val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day4Input.txt"
     val guardSleeps = parseFile(inputFile)
@@ -54,8 +55,25 @@ class Day4Test {
       }
     }
     println("guard id: ${guard!!.guardId}")
-    println("most sleep minute: ${guard!!.sleepMostMinute()}")
-    assertEquals(151754, guard!!.guardId * guard!!.sleepMostMinute())
+    println("most sleep minute: ${guard!!.sleepMostMinute().first}")
+    assertEquals(151754, guard!!.guardId * guard!!.sleepMostMinute().first)
+  }
+
+  // part 2
+  @Test fun test7() {
+    val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day4Input.txt"
+    val guardSleeps = parseFile(inputFile)
+    var guard: GuardSleep? = null
+    var maxSleep = 0
+    guardSleeps.forEach {_, guardSleep ->
+      if (guardSleep.sleepMostMinute().second > maxSleep) {
+        maxSleep = guardSleep.sleepMostMinute().second
+        guard = guardSleep
+      }
+    }
+    println("guard id: ${guard!!.guardId}")
+    println("most sleep minute: ${guard!!.sleepMostMinute().first}")
+    assertEquals(19896, guard!!.guardId * guard!!.sleepMostMinute().first)
   }
 
 }
