@@ -24,6 +24,19 @@ data class GuardSleep(
   fun totalSleepMinutes() =
       sleeps.fold(0) { acc, sleep ->  acc + sleep.minutes()}
 
+  fun sleepMostMinute(): Int {
+    val minuteCount = mutableMapOf<Int, Int>()
+    sleeps.forEach {sleep ->
+      for (minute in sleep.start until sleep.end) {
+        val count = minuteCount.getOrDefault(minute, 0)
+        minuteCount[minute] = count + 1
+      }
+    }
+    val maxCount = minuteCount.values.max()
+    val counts = minuteCount.filter { entry -> entry.value == maxCount }
+    return counts.keys.first()
+  }
+
   override fun toString(): String {
     return "GuardSleep(guardId=${guardId}, sleeps=${sleeps}"
   }
