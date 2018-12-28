@@ -1,4 +1,4 @@
-package year2018
+package year2018.day2
 
 import kotlin.test.assertEquals
 import org.junit.Test
