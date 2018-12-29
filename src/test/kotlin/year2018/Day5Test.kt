@@ -16,4 +16,11 @@ class Day5Test {
     val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day5Input.txt"
     assertEquals(11194, reactor(File(inputFile).readLines().first()).length)
   }
+
+  // part 2
+  @Test fun test3() {
+    assertEquals(4, part2("dabAcCaCBAcCcaDA"))
+    val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day5Input.txt"
+    assertEquals(4178, part2(File(inputFile).readLines().first()))
+  }
 }
