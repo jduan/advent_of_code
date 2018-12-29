@@ -1,48 +1,23 @@
 package year2018.day5
 
-import java.io.File
-
-assertEquals("p", reactor("nVvNOoHhiJjlLSuUvVsHhIp"))
+import java.util.*
 
 fun reactor(polymer: String): String {
-  val size = polymer.length
-  if (size < 2) {
-    return polymer
-  }
+  val stack = Stack<Char>()
 
-  val marked = mutableSetOf<Int>()
-
-  var previous = 0
-  var current = 1
-  while (current < size) {
-    if (previous < 0) {
-      previous = current
-      current += 1
-    }
-    val previousChar = polymer[previous]
-    val currentChar = polymer[current]
-    val diff = currentChar - previousChar
-    if (diff == 32 || diff == -32) {
-      // collapse
-      marked.add(current)
-      marked.add(previous)
-      current += 1
-      previous -= 1
+  polymer.forEach { char ->
+    if (stack.empty()) {
+      stack.push(char)
     } else {
-      previous = current
-      current += 1
+      val top = stack.peek()
+      val diff = top - char
+      if (diff == 32 || diff == -32) {
+        stack.pop()
+      } else {
+        stack.push(char)
+      }
     }
   }
 
-//  if (current - previous == 1) {
-//    remains.append(polymer.last())
-//  }
-
-  val remains = StringBuffer()
-  for (i in 0 until size) {
-    if (!marked.contains(i))
-      remains.append(polymer[i])
-  }
-
-  return remains.toString()
+  return stack.toList().joinToString(separator = "")
 }
