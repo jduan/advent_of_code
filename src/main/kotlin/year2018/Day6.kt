@@ -11,3 +11,12 @@ fun parseFile(path: String): List<Coordinate> =
       val parts = line.split(",")
       Coordinate(parts[0].toInt(), parts[1].trim().toInt())
     }
+
+data class Boundary(val minX: Int, val minY: Int, val maxX: Int, val maxY: Int)
+
+fun getBoundary(coords: List<Coordinate>): Boundary {
+  val xs = coords.map { coord -> coord.x }
+  val ys = coords.map { coord -> coord.y }
+
+  return Boundary(xs.min()!!, ys.min()!!, xs.max()!!, ys.max()!!)
+}
