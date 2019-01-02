@@ -17,4 +17,17 @@ class Day7Test {
     assertEquals(1, nodes.size)
     assertEquals("C", nodes.first().name)
   }
+
+  @Test
+  fun test3() {
+    val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day7TestInput.txt"
+    assertEquals("CABDFE", topsort(inputFile))
+  }
+
+  // part 1
+  @Test
+  fun test4() {
+    val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day7Input.txt"
+    assertEquals("ABLCFNSXZPRHVEGUYKDIMQTWJO", topsort(inputFile))
+  }
 }

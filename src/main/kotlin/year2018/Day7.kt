@@ -12,9 +12,31 @@ class Node(val name: String) {
         next.incoming += 1
     }
 
+    fun decrement() {
+        incoming--
+    }
+
     override fun toString(): String {
         return "Node(name: $name, incoming: $incoming)"
     }
+}
+
+fun topsort(path: String): String {
+    val nodes = parseFile(path).toMutableList()
+    val order = StringBuffer()
+    while (nodes.isNotEmpty()) {
+        val node = nodes.sortedBy { it.name }.first()
+        nodes.remove(node)
+        order.append(node.name)
+        for (next in node.nexts) {
+            next.decrement()
+            if (next.incoming == 0) {
+                nodes.add(next)
+            }
+        }
+    }
+
+    return order.toString()
 }
 
 // Return a list of nodes with no incoming edges
@@ -30,8 +52,6 @@ fun parseFile(path: String): List<Node> {
         nodes.put(name1, node1)
         nodes.put(name2, node2)
     }
-
-    println(nodes)
 
     return nodes.values.filter { it.incoming == 0 }
 }
