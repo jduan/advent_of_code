@@ -9,4 +9,12 @@ class Day7Test {
     assertEquals(Pair("A", "L"),
             parseLine("Step A must be finished before step L can begin."))
   }
+
+  @Test
+  fun test2() {
+    val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day7TestInput.txt"
+    val nodes = parseFile(inputFile)
+    assertEquals(1, nodes.size)
+    assertEquals("C", nodes.first().name)
+  }
 }

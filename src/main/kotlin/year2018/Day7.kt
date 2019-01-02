@@ -11,15 +11,30 @@ class Node(val name: String) {
         nexts.add(next)
         next.incoming += 1
     }
+
+    override fun toString(): String {
+        return "Node(name: $name, incoming: $incoming)"
+    }
 }
 
 // Return a list of nodes with no incoming edges
-//fun parseFile(path: String): List<Node> {
-//   var nodes: MutableList<Node> = mutableListOf()
-//    File(path).forEachLine { line ->
-//
-//    }
-//}
+fun parseFile(path: String): List<Node> {
+   var nodes: MutableMap<String, Node> = mutableMapOf()
+    File(path).forEachLine { line ->
+        val pair = parseLine(line)
+        val name1 = pair.first
+        val name2 = pair.second
+        val node1 = nodes.getOrDefault(name1, Node(name1))
+        val node2 = nodes.getOrDefault(name2, Node(name2))
+        node1.addNext(node2)
+        nodes.put(name1, node1)
+        nodes.put(name2, node2)
+    }
+
+    println(nodes)
+
+    return nodes.values.filter { it.incoming == 0 }
+}
 
 // Step A must be finished before step L can begin.
 fun parseLine(line: String): Pair<String, String> {
