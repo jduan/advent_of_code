@@ -21,6 +21,7 @@ class Node(val name: String) {
     }
 }
 
+// part 1
 fun topsort(path: String): String {
     val nodes = parseFile(path).toMutableList()
     val order = StringBuffer()
@@ -37,6 +38,80 @@ fun topsort(path: String): String {
     }
 
     return order.toString()
+}
+
+class Worker {
+    var node: Node? = null
+    var remaining_load: Int? = null
+
+    fun start(node: Node) {
+        this.node = node
+        remaining_load = node.name.first().toUpperCase() - 'A' + 1
+    }
+
+    fun decrement() {
+        if (remaining_load != null) {
+            remaining_load = remaining_load!! - 1
+        }
+    }
+
+    fun isDone() = remaining_load == 0
+}
+
+// part 2
+fun topsort2(path: String, workerNum: Int): String {
+    val nodes = parseFile(path).toMutableList()
+    val order = StringBuffer()
+    val busyWorkers = mutableListOf<Worker>()
+    val idleWorkers = mutableListOf<Worker>()
+    for (i in 0 until workerNum) {
+        idleWorkers.add(Worker())
+    }
+    while (true) {
+        assignWork(nodes, idleWorkers, busyWorkers, order)
+        tick(nodes, idleWorkers, busyWorkers)
+        println("tick, order: $order")
+        if (nodes.isEmpty() && busyWorkers.isEmpty()) {
+            break
+        }
+    }
+
+    return order.toString()
+}
+
+// time passes by 1 second
+fun tick(nodes: MutableList<Node>, idleWorkers: MutableList<Worker>,
+         busyWorkers: MutableList<Worker>) {
+    for (i in 0 until busyWorkers.size) {
+        val worker = busyWorkers.removeAt(0)
+        worker.decrement()
+        if (worker.isDone()) {
+            for (next in worker.node!!.nexts) {
+                nodes.add(next)
+            }
+            idleWorkers.add(worker)
+        } else {
+            // add it back
+            busyWorkers.add(worker)
+        }
+    }
+}
+
+fun assignWork(nodes: MutableList<Node>, idleWorkers: MutableList<Worker>,
+               busyWorkers: MutableList<Worker>, order: StringBuffer) {
+    nodes.sortBy { it.name }
+    while (nodes.isNotEmpty()) {
+        val node = nodes.removeAt(0)
+        if (idleWorkers.isEmpty()) {
+            break
+        } else {
+            val worker = idleWorkers.removeAt(0)
+            worker.start(node)
+            order.append(node.name.first())
+            busyWorkers.add(worker)
+        }
+    }
+    println("after assignWork, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
 }
 
 // Return a list of nodes with no incoming edges

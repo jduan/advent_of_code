@@ -30,4 +30,10 @@ class Day7Test {
     val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day7Input.txt"
     assertEquals("ABLCFNSXZPRHVEGUYKDIMQTWJO", topsort(inputFile))
   }
+
+  @Test
+  fun test5() {
+    val inputFile = System.getProperty("user.dir") + "/src/test/kotlin/year2018/Day7TestInput.txt"
+    assertEquals("CABDFE", topsort2(inputFile, 2))
+  }
 }
