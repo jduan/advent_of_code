@@ -44,9 +44,9 @@ class Worker {
     var node: Node? = null
     var remaining_load: Int? = null
 
-    fun start(node: Node) {
+    fun start(node: Node, baseSeconds: Int) {
         this.node = node
-        remaining_load = node.name.first().toUpperCase() - 'A' + 1
+        remaining_load = node.name.first().toUpperCase() - 'A' + 1 + baseSeconds
     }
 
     fun decrement() {
@@ -59,7 +59,7 @@ class Worker {
 }
 
 // part 2
-fun topsort2(path: String, workerNum: Int): String {
+fun topsort2(path: String, workerNum: Int, baseSeconds: Int = 0): Int {
     val nodes = parseFile(path).toMutableList()
     val order = StringBuffer()
     val busyWorkers = mutableListOf<Worker>()
@@ -67,16 +67,18 @@ fun topsort2(path: String, workerNum: Int): String {
     for (i in 0 until workerNum) {
         idleWorkers.add(Worker())
     }
+    var seconds = 0
     while (true) {
-        assignWork(nodes, idleWorkers, busyWorkers)
+        seconds++
+        assignWork(nodes, idleWorkers, busyWorkers, baseSeconds)
         tick(nodes, idleWorkers, busyWorkers, order)
-        println("tick, order: $order")
+//        println("tick, order: $order")
         if (nodes.isEmpty() && busyWorkers.isEmpty()) {
             break
         }
     }
 
-    return order.toString()
+    return seconds
 }
 
 // time passes by 1 second
@@ -86,12 +88,12 @@ fun tick(nodes: MutableList<Node>, idleWorkers: MutableList<Worker>,
         val worker = busyWorkers.removeAt(0)
         worker.decrement()
         if (worker.isDone()) {
-            println("worker is done: ${worker.node!!.name}")
+//            println("worker is done: ${worker.node!!.name}")
             order.append(worker.node!!.name.first())
             for (next in worker.node!!.nexts) {
                 next.decrement()
                 if (next.incoming == 0) {
-                    println("adding next ${next.name}")
+//                    println("adding next ${next.name}")
                     nodes.add(next)
                 }
             }
@@ -101,19 +103,19 @@ fun tick(nodes: MutableList<Node>, idleWorkers: MutableList<Worker>,
             busyWorkers.add(worker)
         }
     }
-    println("after tick, nodes: $nodes, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
+//    println("after tick, nodes: $nodes, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
 }
 
 fun assignWork(nodes: MutableList<Node>, idleWorkers: MutableList<Worker>,
-               busyWorkers: MutableList<Worker>) {
+               busyWorkers: MutableList<Worker>, baseSeconds: Int) {
     nodes.sortBy { it.name }
     while (nodes.isNotEmpty() && idleWorkers.isNotEmpty()) {
         val node = nodes.removeAt(0)
         val worker = idleWorkers.removeAt(0)
-        worker.start(node)
+        worker.start(node, baseSeconds)
         busyWorkers.add(worker)
     }
-    println("after assignWork, nodes: $nodes, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
+//    println("after assignWork, nodes: $nodes, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
 }
 
 // Return a list of nodes with no incoming edges
