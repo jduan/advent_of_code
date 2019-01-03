@@ -5,7 +5,7 @@ import java.lang.RuntimeException
 
 class Node(val name: String) {
     var nexts: MutableList<Node> = mutableListOf()
-    var incoming: Int = 0
+    private var incoming: Int = 0
 
     fun addNext(next: Node) {
         nexts.add(next)
@@ -16,9 +16,29 @@ class Node(val name: String) {
         incoming--
     }
 
+    fun isReady() = incoming == 0
+
     override fun toString(): String {
         return "Node(name: $name, incoming: $incoming)"
     }
+}
+
+class Worker {
+    var node: Node? = null
+    private var remainingLoad: Int? = null
+
+    fun start(node: Node, baseSeconds: Int) {
+        this.node = node
+        remainingLoad = node.name.first().toUpperCase() - 'A' + 1 + baseSeconds
+    }
+
+    fun decrement() {
+        if (remainingLoad != null) {
+            remainingLoad = remainingLoad!! - 1
+        }
+    }
+
+    fun isDone() = remainingLoad == 0
 }
 
 // part 1
@@ -31,7 +51,7 @@ fun topsort(path: String): String {
         order.append(node.name)
         for (next in node.nexts) {
             next.decrement()
-            if (next.incoming == 0) {
+            if (next.isReady()) {
                 nodes.add(next)
             }
         }
@@ -40,87 +60,71 @@ fun topsort(path: String): String {
     return order.toString()
 }
 
-class Worker {
-    var node: Node? = null
-    var remaining_load: Int? = null
-
-    fun start(node: Node, baseSeconds: Int) {
-        this.node = node
-        remaining_load = node.name.first().toUpperCase() - 'A' + 1 + baseSeconds
-    }
-
-    fun decrement() {
-        if (remaining_load != null) {
-            remaining_load = remaining_load!! - 1
-        }
-    }
-
-    fun isDone() = remaining_load == 0
-}
-
 // part 2
-fun topsort2(path: String, workerNum: Int, baseSeconds: Int = 0): Int {
-    val nodes = parseFile(path).toMutableList()
-    val order = StringBuffer()
-    val busyWorkers = mutableListOf<Worker>()
-    val idleWorkers = mutableListOf<Worker>()
-    for (i in 0 until workerNum) {
-        idleWorkers.add(Worker())
-    }
-    var seconds = 0
-    while (true) {
-        seconds++
-        assignWork(nodes, idleWorkers, busyWorkers, baseSeconds)
-        tick(nodes, idleWorkers, busyWorkers, order)
-//        println("tick, order: $order")
-        if (nodes.isEmpty() && busyWorkers.isEmpty()) {
-            break
+class Solution2(path: String, private val workerNum: Int,
+                private val baseSeconds: Int = 0) {
+    private val nodes = parseFile(path).toMutableList()
+    private val order = StringBuffer()
+    private val busyWorkers = mutableListOf<Worker>()
+    private val idleWorkers = mutableListOf<Worker>()
+
+    fun topsort(): Int {
+        for (i in 0 until workerNum) {
+            idleWorkers.add(Worker())
         }
+        var seconds = 0
+        while (true) {
+            seconds++
+            assignWork()
+            tick()
+//        println("tick, order: $order")
+            if (nodes.isEmpty() && busyWorkers.isEmpty()) {
+                break
+            }
+        }
+
+        return seconds
     }
 
-    return seconds
-}
-
-// time passes by 1 second
-fun tick(nodes: MutableList<Node>, idleWorkers: MutableList<Worker>,
-         busyWorkers: MutableList<Worker>, order: StringBuffer) {
-    for (i in 0 until busyWorkers.size) {
-        val worker = busyWorkers.removeAt(0)
-        worker.decrement()
-        if (worker.isDone()) {
+    // time passes by 1 second
+    private fun tick() {
+        for (i in 0 until busyWorkers.size) {
+            val worker = busyWorkers.removeAt(0)
+            worker.decrement()
+            if (worker.isDone()) {
 //            println("worker is done: ${worker.node!!.name}")
-            order.append(worker.node!!.name.first())
-            for (next in worker.node!!.nexts) {
-                next.decrement()
-                if (next.incoming == 0) {
+                order.append(worker.node!!.name.first())
+                for (next in worker.node!!.nexts) {
+                    next.decrement()
+                    if (next.isReady()) {
 //                    println("adding next ${next.name}")
-                    nodes.add(next)
+                        nodes.add(next)
+                    }
                 }
+                idleWorkers.add(worker)
+            } else {
+                // add it back
+                busyWorkers.add(worker)
             }
-            idleWorkers.add(worker)
-        } else {
-            // add it back
+        }
+//    println("after tick, nodes: $nodes, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
+    }
+
+    private fun assignWork() {
+        nodes.sortBy { it.name }
+        while (nodes.isNotEmpty() && idleWorkers.isNotEmpty()) {
+            val node = nodes.removeAt(0)
+            val worker = idleWorkers.removeAt(0)
+            worker.start(node, baseSeconds)
             busyWorkers.add(worker)
         }
-    }
-//    println("after tick, nodes: $nodes, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
-}
-
-fun assignWork(nodes: MutableList<Node>, idleWorkers: MutableList<Worker>,
-               busyWorkers: MutableList<Worker>, baseSeconds: Int) {
-    nodes.sortBy { it.name }
-    while (nodes.isNotEmpty() && idleWorkers.isNotEmpty()) {
-        val node = nodes.removeAt(0)
-        val worker = idleWorkers.removeAt(0)
-        worker.start(node, baseSeconds)
-        busyWorkers.add(worker)
-    }
 //    println("after assignWork, nodes: $nodes, idleWorkers: $idleWorkers, busyWorkers: $busyWorkers")
+    }
 }
 
 // Return a list of nodes with no incoming edges
 fun parseFile(path: String): List<Node> {
-   var nodes: MutableMap<String, Node> = mutableMapOf()
+   val nodes: MutableMap<String, Node> = mutableMapOf()
     File(path).forEachLine { line ->
         val pair = parseLine(line)
         val name1 = pair.first
@@ -128,11 +132,11 @@ fun parseFile(path: String): List<Node> {
         val node1 = nodes.getOrDefault(name1, Node(name1))
         val node2 = nodes.getOrDefault(name2, Node(name2))
         node1.addNext(node2)
-        nodes.put(name1, node1)
-        nodes.put(name2, node2)
+        nodes[name1] = node1
+        nodes[name2] = node2
     }
 
-    return nodes.values.filter { it.incoming == 0 }
+    return nodes.values.filter { it.isReady() }
 }
 
 // Step A must be finished before step L can begin.
